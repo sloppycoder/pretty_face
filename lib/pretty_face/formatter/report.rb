@@ -190,7 +190,7 @@ module PrettyFace
     end
 
     class ReportStep
-      attr_accessor :name, :keyword, :file_colon_line, :status, :duration, :table, :multiline_arg, :error
+      attr_accessor :name, :keyword, :file_colon_line, :status, :duration, :table, :multiline_arg, :error, :image, :image_label, :image_id
 
       def initialize(step)
         @name = step.name
@@ -219,6 +219,10 @@ module PrettyFace
         !multiline_arg.nil? && !has_table?
       end
 
+      def has_image?
+        image_id != nil
+      end
+      
       def file_with_error(file_colon_line)
         @snippet_extractor ||= SnippetExtractor.new
         file, line = @snippet_extractor.file_name_and_line(file_colon_line)

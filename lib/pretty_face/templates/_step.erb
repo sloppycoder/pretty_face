@@ -1,4 +1,11 @@
 <%= "#{step.keyword} #{step.name}" %>
+<% if step.has_image? %>
+	<br />
+    <a href='' onclick="img=document.getElementById('<%= step.image_id %>'); img.style.display = (img.style.display == 'none' ? 'block' : 'none');return false"><%= "#{step.image_label}"%></a>
+    <br />
+    <img id='<%= step.image_id %>' style='display: none' src='<%= feature.directory_prefix_for(feature.file) %>images/<%= step.image %>'/>
+<% end %>
+
 <% if step.has_table? %>
 	<br />
 	<table border="1" class="param_table">

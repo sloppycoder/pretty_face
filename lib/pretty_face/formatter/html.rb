@@ -21,6 +21,7 @@ module PrettyFace
       include ViewHelper
 
       attr_reader :report, :logo
+      attr_accessor :embed_mode, :step_image, :step_image_label, :step_image_id
 
       def initialize(step_mother, path_or_io, options)
         @path = path_or_io
@@ -34,6 +35,7 @@ module PrettyFace
         @report = Report.new
         @img_id = 0
         @logo = 'face.png'
+        @embed_mode = :scenario
       end
 
       def set_path_and_file(path_or_io)
@@ -51,9 +53,16 @@ module PrettyFace
       end
 
       def embed_image(src, label)
-        @report.current_scenario.image << src.split(separator).last
-        @report.current_scenario.image_label << label
-        @report.current_scenario.image_id << "img_#{@img_id}"
+        if  @embed_mode == :scenario
+          @report.current_scenario.image << src.split(separator).last
+          @report.current_scenario.image_label << label
+          @report.current_scenario.image_id << "img_#{@img_id}"
+        elsif @embed_mode == :step
+          @step_image = src.split(separator).last
+          @step_image_label = label
+          @step_image_id = "img_#{@img_id}"
+        end
+
         @img_id += 1
         filename = "#{File.dirname(@path)}#{separator}images"
         FileUtils.cp src, filename
@@ -120,6 +129,17 @@ module PrettyFace
           step.table = @cells
           @cells = nil
         end
+      end
+
+      def before_steps(s)
+        @embed_mode = :step
+      end
+
+      def after_steps(s)
+        @embed_mode = :scenario
+        @step_image = nil
+        @step_image_label = nil
+        @step_image_id = nil
       end
 
       def after_features(features)
@@ -234,6 +254,10 @@ module PrettyFace
         report_step = ReportStep.new(step)
         report_step.duration = duration
         report_step.status = status unless status.nil?
+        #binding.pry
+        report_step.image = @step_image
+        report_step.image_label = @step_image_label
+        report_step.image_id = @step_image_id
         if step.background?
           @report.current_feature.background << report_step if @report.processing_background_steps?
         else
