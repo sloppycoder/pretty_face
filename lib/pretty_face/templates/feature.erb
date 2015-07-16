@@ -88,7 +88,7 @@
 		<tr>
 		  <td><%= raw(feature.image_tag_for(step.status, feature.file)) %></td>
 		  <td>
-		    <%= render "step", step: step %>
+		    <%= render "step", step: step, feature: feature %>
 		  </td>
 		</tr>
 	      <% end %>
